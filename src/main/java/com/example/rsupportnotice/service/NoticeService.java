@@ -28,15 +28,15 @@ public class NoticeService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public Notice createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
-        Notice notice = new Notice(title, content, startDate, endDate, LocalDateTime.now());
+    public void createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
+        Notice notice = new Notice(title, content, startDate, endDate, LocalDateTime.now(), "admin");
 
         // 연관 관계 메서드 사용
         files.stream()
                 .map(fileStorageService::storeFile)
                 .forEach(notice::addAttachment);
 
-        return noticeRepository.save(notice);
+        noticeRepository.save(notice);
     }
 
     @Transactional
@@ -52,7 +52,9 @@ public class NoticeService {
         // 조회수 증가 (비동기 처리)
         incrementViewCountAsync(notice.getId());
 
-        return convertToDetailResponse(notice);
+        NoticeDetailResponse noticeDetailResponse = convertToDetailResponse(notice);
+        notice.setViewCount(noticeDetailResponse.viewCount());
+        return noticeDetailResponse;
     }
 
     @Async
@@ -65,7 +67,7 @@ public class NoticeService {
                 notice.getTitle(),
                 notice.getContent(),
                 notice.getCreatedAt(),
-                notice.getViewCount() + getRedisViewCount(notice.getId()),
+                getRedisViewCount(notice.getId()),
                 notice.getAuthor(),
                 notice.getAttachments().stream()
                         .map(this::convertToAttachmentResponse)

@@ -44,12 +44,13 @@ public class Notice {
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attachment> attachments = new ArrayList<>();
 
-    public Notice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime createdAt) {
+    public Notice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime createdAt, String author) {
         this.title = title;
         this.content = content;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdAt = createdAt;
+        this.author = author;
     }
 
     public void addAttachment(Attachment attachment) {

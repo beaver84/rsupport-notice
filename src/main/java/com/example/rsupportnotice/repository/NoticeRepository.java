@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecificationExecutor<Notice> {
-    // 목록 조회 (페이징 추가 가능)
+    // 목록 조회
     @Query("SELECT new com.example.rsupportnotice.domain.dto.NoticeListResponse(" +
             "n.title, " +
             "CASE WHEN SIZE(n.attachments) > 0 THEN true ELSE false END, " +
