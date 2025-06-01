@@ -3,9 +3,13 @@ package com.example.rsupportnotice.domain.dto;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AddNoticeRequest {
 
@@ -24,13 +28,9 @@ public class AddNoticeRequest {
             @NotBlank
             private String content;
 
-            @NotNull
-            private LocalDateTime noticeStartDate;
-
-            @NotNull
-            private LocalDateTime noticeEndDate;
-
-            private File fileName;
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate;
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate;
+            List<MultipartFile> files;
         }
     }
 }

@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AddNoticeResponse {
+public class NoticeResponse {
     private Object data;
-    private AddNoticeResponse.ErrorInfo error;
+    private NoticeResponse.ErrorInfo error;
 
     @Builder
     @Getter
