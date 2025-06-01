@@ -2,9 +2,9 @@ package com.example.rsupportnotice.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice {
 
@@ -31,19 +32,21 @@ public class Notice {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    @Column(nullable = false)
+    @Column
     private Long viewCount = 0L;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attachment> attachments = new ArrayList<>();
 
-    @Builder
-    public Notice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, Long viewCount, List<Attachment> attachments) {
+    public Notice(String title, String content, LocalDateTime startDate, LocalDateTime endDate) {
         this.title = title;
         this.content = content;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.viewCount = viewCount;
-        this.attachments = attachments;
+    }
+
+    public void addAttachment(Attachment attachment) {
+        this.attachments.add(attachment);
+        attachment.setNotice(this);
     }
 }

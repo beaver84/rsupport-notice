@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -23,9 +22,8 @@ import java.util.stream.Collectors;
 public class NoticeController {
 
     private final NoticeService noticeService;
-    private final FileStorageService fileStorageService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/notices", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<NoticeResponse> createNotice(
             @RequestParam("title") String title,
             @RequestParam("content") String content,
@@ -33,11 +31,7 @@ public class NoticeController {
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @RequestParam("files") List<MultipartFile> files
     ) {
-        List<Attachment> attachments = files.stream()
-                .map(fileStorageService::storeFile)
-                .collect(Collectors.toList());
-
-        Notice savedNotice = noticeService.createNotice(title, content, startDate, endDate, attachments);
+        noticeService.createNotice(title, content, startDate, endDate, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(NoticeResponse.builder().build());
     }
 }
