@@ -3,6 +3,7 @@ package com.example.rsupportnotice.controller;
 import com.example.rsupportnotice.domain.dto.NoticeDetailResponse;
 import com.example.rsupportnotice.domain.dto.NoticeListResponse;
 import com.example.rsupportnotice.domain.dto.NoticeResponse;
+import com.example.rsupportnotice.domain.dto.NoticeSearchCondition;
 import com.example.rsupportnotice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +48,23 @@ public class NoticeController {
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(noticeService.getNoticeDetail(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<NoticeListResponse>> searchNotices(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "title+content") String searchType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        NoticeSearchCondition condition = new NoticeSearchCondition();
+        condition.setKeyword(keyword);
+        condition.setSearchType(searchType);
+        condition.setStartDate(startDate);
+        condition.setEndDate(endDate);
+
+        List<NoticeListResponse> results = noticeService.searchNotices(condition);
+        return ResponseEntity.ok(results);
     }
 }
 

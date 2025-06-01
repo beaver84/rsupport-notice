@@ -1,14 +1,14 @@
 package com.example.rsupportnotice.service;
 
-import com.example.rsupportnotice.domain.dto.AttachmentResponse;
-import com.example.rsupportnotice.domain.dto.NoticeDetailResponse;
-import com.example.rsupportnotice.domain.dto.NoticeListResponse;
+import com.example.rsupportnotice.domain.dto.*;
 import com.example.rsupportnotice.domain.entity.Attachment;
 import com.example.rsupportnotice.domain.entity.Notice;
 import com.example.rsupportnotice.repository.NoticeRepository;
+import com.example.rsupportnotice.repository.NoticeSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class NoticeService {
 
     @Transactional
     public Notice createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
-        Notice notice = new Notice(title, content, startDate, endDate);
+        Notice notice = new Notice(title, content, startDate, endDate, LocalDateTime.now());
 
         // 연관 관계 메서드 사용
         files.stream()
@@ -91,5 +91,26 @@ public class NoticeService {
                 attachment.getOriginalFileName(),
                 downloadUrl
         ));
+    }
+
+    public List<NoticeListResponse> searchNotices(NoticeSearchCondition condition) {
+        Specification<Notice> spec = Specification.where(null);
+
+        if (condition.getKeyword() != null && !condition.getKeyword().isBlank()) {
+            spec = spec.and(NoticeSpecifications.containsKeyword(condition.getKeyword(), condition.getSearchType()));
+        }
+        if (condition.getStartDate() != null || condition.getEndDate() != null) {
+            spec = spec.and(NoticeSpecifications.betweenCreatedAt(condition.getStartDate(), condition.getEndDate()));
+        }
+
+        return noticeRepository.findAll(spec).stream()
+                .map(notice -> new NoticeListResponse(
+                        notice.getTitle(),
+                        notice.getAttachments() != null && !notice.getAttachments().isEmpty(),
+                        notice.getCreatedAt(),
+                        notice.getViewCount(),
+                        notice.getAuthor()
+                ))
+                .collect(Collectors.toList());
     }
 }
