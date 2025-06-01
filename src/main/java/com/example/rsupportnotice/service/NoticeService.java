@@ -115,4 +115,37 @@ public class NoticeService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void updateNotice(Long id, String title, String content,
+                                       LocalDateTime startDate, LocalDateTime endDate,
+                                       List<MultipartFile> files) {
+        Notice notice = noticeRepository.findByIdWithAttachments(id)
+                .orElseThrow(() -> new EntityNotFoundException("Notice not found"));
+
+        notice.setTitle(title);
+        notice.setContent(content);
+        notice.setStartDate(startDate);
+        notice.setEndDate(endDate);
+
+        // 기존 첨부파일 삭제 및 새 첨부파일 추가
+        if (files != null && !files.isEmpty()) {
+            notice.clearAttachments();
+            files.stream()
+                    .map(fileStorageService::storeFile)
+                    .forEach(notice::addAttachment);
+        }
+
+        noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void deleteNotice(Long id) {
+        Notice notice = noticeRepository.findByIdWithAttachments(id)
+                .orElseThrow(() -> new EntityNotFoundException("삭제할 공지사항이 없습니다. id: " + id));
+
+        notice.getAttachments().forEach(fileStorageService::deleteFile);
+
+        noticeRepository.delete(notice);
+    }
 }

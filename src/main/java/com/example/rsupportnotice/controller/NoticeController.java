@@ -66,5 +66,24 @@ public class NoticeController {
         List<NoticeListResponse> results = noticeService.searchNotices(condition);
         return ResponseEntity.ok(results);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<NoticeResponse> updateNotice(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files
+    ) {
+        noticeService.updateNotice(id, title, content, startDate, endDate, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(NoticeResponse.builder().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
+        noticeService.deleteNotice(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 

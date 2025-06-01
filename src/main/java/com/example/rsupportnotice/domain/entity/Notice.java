@@ -57,4 +57,8 @@ public class Notice {
         this.attachments.add(attachment);
         attachment.setNotice(this);
     }
+
+    public void clearAttachments() {
+        this.attachments.clear();
+    }
 }
