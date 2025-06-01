@@ -35,6 +35,12 @@ public class Notice {
     @Column
     private Long viewCount = 0L;
 
+    @Column
+    private LocalDateTime createdAt;
+
+    @Column
+    private String author;
+
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attachment> attachments = new ArrayList<>();
 
