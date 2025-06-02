@@ -33,7 +33,7 @@ public class NoticeService {
     private final RedisConnectionFactory redisConnectionFactory;
 
     @Transactional
-    public void createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
+    public Notice createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
         Notice notice = new Notice(title, content, startDate, endDate, LocalDateTime.now(), "admin");
 
         // 연관 관계 메서드 사용
@@ -41,7 +41,7 @@ public class NoticeService {
                 .map(fileStorageService::storeFile)
                 .forEach(notice::addAttachment);
 
-        noticeRepository.save(notice);
+        return noticeRepository.save(notice);
     }
 
     @Transactional
