@@ -8,7 +8,10 @@ import com.example.rsupportnotice.repository.NoticeSpecifications;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NoticeService {
@@ -26,6 +30,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final FileStorageService fileStorageService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     @Transactional
     public void createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
@@ -50,11 +55,22 @@ public class NoticeService {
                 .orElseThrow(() -> new EntityNotFoundException("Notice not found"));
 
         // 조회수 증가 (비동기 처리)
-        incrementViewCountAsync(notice.getId());
+        if (isRedisAvailable()) {
+            incrementViewCountAsync(notice.getId());
+        }
 
         NoticeDetailResponse noticeDetailResponse = convertToDetailResponse(notice);
         notice.setViewCount(noticeDetailResponse.viewCount());
         return noticeDetailResponse;
+    }
+
+    private boolean isRedisAvailable() {
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            return !connection.isClosed();
+        } catch (Exception e) {
+            log.error("Redis 연결 불가");
+            return false;
+        }
     }
 
     @Async
@@ -67,7 +83,7 @@ public class NoticeService {
                 notice.getTitle(),
                 notice.getContent(),
                 notice.getCreatedAt(),
-                getRedisViewCount(notice.getId()),
+                isRedisAvailable() ? getRedisViewCount(notice.getId()) : 0L,
                 notice.getAuthor(),
                 notice.getAttachments().stream()
                         .map(this::convertToAttachmentResponse)
