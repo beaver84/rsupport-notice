@@ -24,7 +24,8 @@ ThreadLocal에 사용자 정보를 입력하여 각 요청별로 독립적인 �
 5. IDE에서 RsupportNoticeApplication의 메인 함수를 실행
 
 6. 과제에서 요구하는 API들을 차례로 Postman 등으로 API 테스트 
-   * 예) 학생 추가 - URL에 http://localhost:8080/api/notices 입력, Body에 form-data 형식으로 request 입력(Postman 링크 확인 - https://.postman.co/workspace/kuka-Workspace~2d33b039-aec0-4da4-83be-ba660625ac56/collection/10700825-6a5ae6a5-5ae0-49e5-bc27-3bd200369b26?action=share&creator=10700825)
+   * 예) 학생 추가 - URL에 http://localhost:8080/api/notices 입력, Body에 form-data 형식으로 request 입력
+   * Postman 링크 확인 - (https://postman.co/workspace/kuka-Workspace~2d33b039-aec0-4da4-83be-ba660625ac56/collection/10700825-6a5ae6a5-5ae0-49e5-bc27-3bd200369b26?action=share&creator=10700825)
 
 7. DB의 데이터를 확인하는 방법은 localhost:8080/h2-console 에 접속 후 확인, 접속정보는 application.yml 파일 참조)
  
