@@ -1,5 +1,6 @@
 package com.example.rsupportnotice.service;
 
+import com.example.rsupportnotice.config.exception.NoticeNotFoundException;
 import com.example.rsupportnotice.domain.dto.*;
 import com.example.rsupportnotice.domain.entity.Attachment;
 import com.example.rsupportnotice.domain.entity.Notice;
@@ -52,7 +53,7 @@ public class NoticeService {
     @Transactional
     public NoticeDetailResponse getNoticeDetail(Long id) {
         Notice notice = noticeRepository.findByIdWithAttachments(id)
-                .orElseThrow(() -> new EntityNotFoundException("Notice not found"));
+                .orElseThrow(() -> new NoticeNotFoundException(id));
 
         // 조회수 증가 (비동기 처리)
         if (isRedisAvailable()) {
@@ -137,7 +138,7 @@ public class NoticeService {
                                        LocalDateTime startDate, LocalDateTime endDate,
                                        List<MultipartFile> files) {
         Notice notice = noticeRepository.findByIdWithAttachments(id)
-                .orElseThrow(() -> new EntityNotFoundException("Notice not found"));
+                .orElseThrow(() -> new NoticeNotFoundException(id));
 
         notice.setTitle(title);
         notice.setContent(content);
@@ -158,7 +159,7 @@ public class NoticeService {
     @Transactional
     public void deleteNotice(Long id) {
         Notice notice = noticeRepository.findByIdWithAttachments(id)
-                .orElseThrow(() -> new EntityNotFoundException("삭제할 공지사항이 없습니다. id: " + id));
+                .orElseThrow(() -> new NoticeNotFoundException(id));
 
         notice.getAttachments().forEach(fileStorageService::deleteFile);
 
