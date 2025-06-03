@@ -28,4 +28,9 @@ public class Attachment {
         this.storedFileName = storedFileName;
         this.notice = notice;
     }
+
+    public Attachment(String originalFileName, String storedFileName) {
+        this.originalFileName = originalFileName;
+        this.storedFileName = storedFileName;
+    }
 }

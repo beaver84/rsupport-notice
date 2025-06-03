@@ -1,5 +1,6 @@
 package com.example.rsupportnotice.service;
 
+import com.example.rsupportnotice.config.exception.NoticeNotFoundException;
 import com.example.rsupportnotice.domain.dto.NoticeDetailResponse;
 import com.example.rsupportnotice.domain.dto.NoticeListResponse;
 import com.example.rsupportnotice.domain.dto.NoticeSearchCondition;
@@ -332,7 +333,7 @@ class NoticeServiceTest {
         when(noticeRepository.findByIdWithAttachments(invalidId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(EntityNotFoundException.class, () -> {
+        assertThrows(NoticeNotFoundException.class, () -> {
             noticeService.updateNotice(invalidId, "Title", "Content",
                     LocalDateTime.now(), LocalDateTime.now().plusDays(1),
                     Collections.emptyList());
@@ -384,7 +385,7 @@ class NoticeServiceTest {
                 .thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(EntityNotFoundException.class, () -> {
+        assertThrows(NoticeNotFoundException.class, () -> {
             noticeService.deleteNotice(invalidId);
         });
         verify(fileStorageService, never()).deleteFile(any());
