@@ -1,6 +1,7 @@
 package com.example.rsupportnotice.service;
 
 import com.example.rsupportnotice.config.exception.NoticeNotFoundException;
+import com.example.rsupportnotice.config.usercontext.UserContextHolder;
 import com.example.rsupportnotice.domain.dto.*;
 import com.example.rsupportnotice.domain.entity.Attachment;
 import com.example.rsupportnotice.domain.entity.Notice;
@@ -36,6 +37,9 @@ public class NoticeService {
     @Transactional
     public Notice createNotice(String title, String content, LocalDateTime startDate, LocalDateTime endDate, List<MultipartFile> files) {
         Notice notice = new Notice(title, content, startDate, endDate, LocalDateTime.now(), "admin");
+
+        // ThreadLocal에서 사용자 정보 가져오기
+        notice.setAuthor(UserContextHolder.getCurrentUser());
 
         // 연관 관계 메서드 사용
         files.stream()
@@ -144,6 +148,9 @@ public class NoticeService {
         notice.setContent(content);
         notice.setStartDate(startDate);
         notice.setEndDate(endDate);
+
+        // ThreadLocal에서 사용자 정보 가져오기
+        notice.setAuthor(UserContextHolder.getCurrentUser());
 
         // 기존 첨부파일 삭제 및 새 첨부파일 추가
         if (files != null && !files.isEmpty()) {
