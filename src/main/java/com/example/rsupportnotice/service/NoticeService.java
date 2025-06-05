@@ -6,12 +6,11 @@ import com.example.rsupportnotice.domain.dto.*;
 import com.example.rsupportnotice.domain.entity.Attachment;
 import com.example.rsupportnotice.domain.entity.Notice;
 import com.example.rsupportnotice.repository.NoticeRepository;
-import com.example.rsupportnotice.repository.NoticeSpecifications;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -116,20 +115,13 @@ public class NoticeService {
         ));
     }
 
-    public List<NoticeListResponse> searchNotices(NoticeSearchCondition condition) {
-        Specification<Notice> spec = Specification.where(null);
+    public List<NoticeListResponse> searchNotices(NoticeSearchCondition condition, Pageable pageable) {
+        Page<Notice> notices = noticeRepository.searchNotices(condition, pageable);
 
-        if (condition.getKeyword() != null && !condition.getKeyword().isBlank()) {
-            spec = spec.and(NoticeSpecifications.containsKeyword(condition.getKeyword(), condition.getSearchType()));
-        }
-        if (condition.getStartDate() != null || condition.getEndDate() != null) {
-            spec = spec.and(NoticeSpecifications.betweenCreatedAt(condition.getStartDate(), condition.getEndDate()));
-        }
-
-        return noticeRepository.findAll(spec).stream()
+        return notices.getContent().stream()
                 .map(notice -> new NoticeListResponse(
                         notice.getTitle(),
-                        notice.getAttachments() != null && !notice.getAttachments().isEmpty(),
+                        !notice.getAttachments().isEmpty(),
                         notice.getCreatedAt(),
                         notice.getViewCount(),
                         notice.getAuthor()

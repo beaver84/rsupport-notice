@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecificationExecutor<Notice> {
+public interface NoticeRepository extends JpaRepository<Notice, Long>, JpaSpecificationExecutor<Notice>, NoticeRepositoryCustom {
     // 목록 조회
     @Query("SELECT new com.example.rsupportnotice.domain.dto.NoticeListResponse(" +
             "n.title, " +

@@ -13,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -208,10 +211,11 @@ class NoticeServiceTest {
         Notice notice2 = createNoticeWithAttachment("title", "test content");
         List<Notice> mockNotices = Arrays.asList(notice1, notice2);
 
-        when(noticeRepository.findAll(any(Specification.class))).thenReturn(mockNotices);
+        when(noticeRepository.searchNotices(eq(condition), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(mockNotices));
 
         // When
-        List<NoticeListResponse> result = noticeService.searchNotices(condition);
+        List<NoticeListResponse> result = noticeService.searchNotices(condition, Pageable.ofSize(1));
 
         // Then
         assertEquals(2, result.size());
@@ -231,10 +235,11 @@ class NoticeServiceTest {
         Notice notice = createNoticeWithAttachment("test title", "content");
         List<Notice> mockNotices = Collections.singletonList(notice);
 
-        when(noticeRepository.findAll(any(Specification.class))).thenReturn(mockNotices);
+        when(noticeRepository.searchNotices(eq(condition), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(mockNotices));
 
         // When
-        List<NoticeListResponse> result = noticeService.searchNotices(condition);
+        List<NoticeListResponse> result = noticeService.searchNotices(condition, Pageable.ofSize(1));
 
         // Then
         assertEquals(1, result.size());
@@ -257,10 +262,11 @@ class NoticeServiceTest {
         notice.setCreatedAt(LocalDateTime.of(2023, 6, 1, 0, 0));
         List<Notice> mockNotices = Collections.singletonList(notice);
 
-        when(noticeRepository.findAll(any(Specification.class))).thenReturn(mockNotices);
+        when(noticeRepository.searchNotices(eq(condition), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(mockNotices));
 
         // When
-        List<NoticeListResponse> result = noticeService.searchNotices(condition);
+        List<NoticeListResponse> result = noticeService.searchNotices(condition, Pageable.unpaged());
 
         // Then
         assertEquals(1, result.size());
@@ -281,10 +287,11 @@ class NoticeServiceTest {
         Notice notice2 = createNoticeWithAttachment("title2", "content2");
         List<Notice> mockNotices = Arrays.asList(notice1, notice2);
 
-        when(noticeRepository.findAll(any(Specification.class))).thenReturn(mockNotices);
+        when(noticeRepository.searchNotices(eq(condition), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(mockNotices));
 
         // When
-        List<NoticeListResponse> result = noticeService.searchNotices(condition);
+        List<NoticeListResponse> result = noticeService.searchNotices(condition, Pageable.ofSize(1));
 
         // Then
         assertEquals(2, result.size());

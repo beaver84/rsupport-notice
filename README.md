@@ -2,17 +2,19 @@
 
 ## 핵심 문제 해결 전략
 
-JPA와 Redis를 활용한 비동기 처리로 대용량 트래픽에 대비
+JPA와 Redis를 활용한 조회수 카운팅에서 비동기적 처리로 대용량 트래픽에 대비
 
-AOP를 활용하여 어플리케이션 내부적으로 특정 서비스에 성능지표 측정 가능
+AOP를 활용하여 비지니스 코드와 횡단 관심사의 분리로 특정 서비스에 성능지표 측정 가능
 
 ThreadLocal에 사용자 정보를 입력하여 각 요청별로 독립적인 사용자 정보 보관 및 메서드 파라미터 없이 전역적 접근 가능
 
-통합/단위 테스트 작성으로 보다 견고한 코드 작성에 기여
+QueryDsl 사용으로 컴파일 시점의 문법 오류 검출, 타입 안전성, 쿼리 재사용성 및 가독성 향상
+
+통합/단위 테스트 작성으로 보다 견고한 코드 작성
 
 ## 실행 방법
 
-1. 환경 준비 - Java 17 이상, Gradle 8.x 이상 필요, 로컬 DB(H2/MySQL 등) 및 Redis 실행 필요
+1. 환경 준비 - Java 20, Gradle 8.x 이상 필요, 로컬 DB(H2/MySQL 등) 및 Redis 실행 필요
 
 2. 작업할 디렉토리에 소스를 클론 
    * git clone https://github.com/beaver84/rsupport-notice.git
@@ -37,7 +39,9 @@ ThreadLocal에 사용자 정보를 입력하여 각 요청별로 독립적인 �
 
 - 공지사항 상세: GET /api/notices/{id}
 
-- 공지사항 검색: GET /api/notices/search?keyword=...&searchType=...
+- 공지사항 검색(제목 + 내용): GET /api/notices/search?keyword=...&searchType=title+content
+
+- 공지사항 검색(날짜): GET /api/notices/search?startDate=2025-06-05&endDate=2025-06-06
 
 - 공지사항 수정: PUT /api/notices/{id}
 
@@ -53,5 +57,4 @@ ThreadLocal에 사용자 정보를 입력하여 각 요청별로 독립적인 �
 
 - 단위테스트 예시는 src/test/java 디렉토리 참고
 
-- 이 프로젝트는 RESTful 설계, 대용량 트래픽 대응, 확장성, 신뢰성, 유지보수성을 최우선으로 고려하여 구현되었습니다.
-자세한 구현 내용과 예시는 소스코드와 주석, 테스트 코드를 참고해 주세요.
+- 자세한 구현 내용과 예시는 소스코드와 주석, 테스트 코드를 참고 부탁드립니다.

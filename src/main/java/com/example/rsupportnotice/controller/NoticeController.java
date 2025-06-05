@@ -4,8 +4,11 @@ import com.example.rsupportnotice.domain.dto.NoticeDetailResponse;
 import com.example.rsupportnotice.domain.dto.NoticeListResponse;
 import com.example.rsupportnotice.domain.dto.NoticeResponse;
 import com.example.rsupportnotice.domain.dto.NoticeSearchCondition;
+import com.example.rsupportnotice.domain.entity.Notice;
 import com.example.rsupportnotice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,9 +56,12 @@ public class NoticeController {
     @GetMapping("/search")
     public ResponseEntity<List<NoticeListResponse>> searchNotices(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, defaultValue = "title+content") String searchType,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @RequestParam(defaultValue = "title+content") String searchType,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            Pageable pageable
     ) {
         NoticeSearchCondition condition = new NoticeSearchCondition();
         condition.setKeyword(keyword);
@@ -63,8 +69,7 @@ public class NoticeController {
         condition.setStartDate(startDate);
         condition.setEndDate(endDate);
 
-        List<NoticeListResponse> results = noticeService.searchNotices(condition);
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(noticeService.searchNotices(condition, pageable));
     }
 
     @PutMapping("/{id}")
